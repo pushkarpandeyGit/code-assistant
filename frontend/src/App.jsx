@@ -1,42 +1,60 @@
+
 import { useState } from "react";
 
 function App() {
+  const [code, setCode] = useState("");
   const [response, setResponse] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const testBackend = async () => {
-    const res = await fetch("http://localhost:8000/analyze", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        code: "print('Hello')",
-        language: "python",
-        task: "explain",
-      }),
-    });
+  async function analyzeCode() {
+    setLoading(true);
+    setResponse("");
 
-    const data = await res.json();
+    try {
+      const res = await fetch("http://127.0.0.1:8000/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          code: code,
+          language: "python",
+          task: "explain",
+        }),
+      });
 
-    setResponse(JSON.stringify(data, null, 2));
-  };
+      const data = await res.json();
+
+      setResponse(data.response);
+    } catch (error) {
+      setResponse("Something went wrong.");
+      console.error(error);
+    }
+
+    setLoading(false);
+  }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white gap-6">
-      <h1 className="text-4xl font-bold">
-        Code Assistant
-      </h1>
+    <div>
+      <h1>Code Assistant</h1>
 
-      <button
-        onClick={testBackend}
-        className="px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-700"
-      >
-        Test Backend
+      <textarea
+        value={code}
+        onChange={(e) => setCode(e.target.value)}
+        placeholder="Paste your code here..."
+        rows="10"
+        cols="60"
+      />
+
+      <br />
+
+      <button onClick={analyzeCode}>
+        {loading ? "Analyzing..." : "Analyze Code"}
       </button>
 
-      <pre className="bg-gray-800 p-4 rounded-lg">
-        {response}
-      </pre>
+      <h2>AI Response</h2>
+
+      <p>{response}</p>
     </div>
   );
 }
