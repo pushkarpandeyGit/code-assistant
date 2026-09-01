@@ -3,6 +3,7 @@ import { useState } from "react";
 
 function App() {
   const [code, setCode] = useState("");
+  const [task, setTask] = useState("explain");
   const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -19,7 +20,7 @@ function App() {
         body: JSON.stringify({
           code: code,
           language: "python",
-          task: "explain",
+          task: task,
         }),
       });
 
@@ -27,11 +28,11 @@ function App() {
 
       setResponse(data.response);
     } catch (error) {
-      setResponse("Something went wrong.");
       console.error(error);
+      setResponse("Something went wrong.");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   }
 
   return (
@@ -47,14 +48,29 @@ function App() {
       />
 
       <br />
+      <br />
 
-      <button onClick={analyzeCode}>
+      <select
+        value={task}
+        onChange={(e) => setTask(e.target.value)}
+      >
+        <option value="explain">Explain Code</option>
+        <option value="debug">Debug Code</option>
+        <option value="optimize">Optimize Code</option>
+      </select>
+
+      <br />
+      <br />
+
+      <button onClick={analyzeCode} disabled={loading}>
         {loading ? "Analyzing..." : "Analyze Code"}
       </button>
 
       <h2>AI Response</h2>
 
-      <p>{response}</p>
+      <pre>
+        {response}
+      </pre>
     </div>
   );
 }
