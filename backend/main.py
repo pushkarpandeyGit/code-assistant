@@ -1,59 +1,86 @@
+import uuid
 
-import os
-
-from graph_gemini import app as graph_app
-from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+from graph_gemini import app as graph_app
 
-# Load environment variables from .env
-load_dotenv()
-
-
-# Create FastAPI app
 app = FastAPI()
 
-
-# Allow React frontend to communicate with FastAPI
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-# Request structure
-class CodeRequest(BaseModel):
+# =========================================================
+# Request models
+# =========================================================
+
+class AnalyzeRequest(BaseModel):
     code: str
     language: str
-    task: str
+    task: str  # explain | debug | optimize | test | complexity
 
 
-
-# Home route
-@app.get("/")
-def home():
-    return {
-        "message": "Hello from FastAPI"
-    }
+class ChatRequest(BaseModel):
+    code: str
+    language: str
+    question: str
+    thread_id: str | None = None  # omit on first message, reuse afterwards
 
 
-# Code analysis route
+# =========================================================
+# /analyze — unchanged behavior: one-shot, no memory.
+# =========================================================
+
 @app.post("/analyze")
-def analyze(data: CodeRequest):
+def analyze(req: AnalyzeRequest):
+    # Fresh random thread_id every call = no history ever loaded =
+    # identical behavior to before the checkpointer was added.
+    config = {"configurable": {"thread_id": str(uuid.uuid4())}}
 
-    result = graph_app.invoke({
-        "code": data.code,
-        "language": data.language,
-        "task": data.task,
-        "result": ""
-    })
+    result = graph_app.invoke(
+        {
+            "code": req.code,
+            "language": req.language,
+            "task": req.task,
+            "question": None,
+            "result": "",
+            "messages": [],
+        },
+        config=config,
+    )
+
+    return {"result": result["result"]}
+
+
+# =========================================================
+# /chat — the Analyze/Code Chat feature, WITH short-term memory.
+# =========================================================
+
+@app.post("/chat")
+def chat(req: ChatRequest):
+    thread_id = req.thread_id or str(uuid.uuid4())
+    config = {"configurable": {"thread_id": thread_id}}
+
+    result = graph_app.invoke(
+        {
+            "code": req.code,
+            "language": req.language,
+            "task": "analyze",
+            "question": req.question,
+            "result": "",
+            "messages": [],
+        },
+        config=config,
+    )
 
     return {
-        "response": result["result"]
+        "result": result["result"],
+        "thread_id": thread_id,
     }
-    

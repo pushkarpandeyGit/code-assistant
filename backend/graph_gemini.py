@@ -1,28 +1,32 @@
 
-from typing import TypedDict
+from typing import Annotated, Optional, TypedDict
 
+from langchain_core.messages import AIMessage, HumanMessage
+from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import StateGraph, START, END
+from langgraph.graph.message import add_messages
 
 from model import model
 
 
-# -------------------------
+# =========================================================
 # State
-# -------------------------
+# =========================================================
 
 class CodeState(TypedDict):
     code: str
     language: str
-    task: str
+    task: str                 # explain | debug | optimize | test | complexity | analyze
+    question: Optional[str]   # only used by "analyze"
     result: str
+    messages: Annotated[list, add_messages]  # only populated/used by "analyze"
 
 
-# -------------------------
+# =========================================================
 # Helper
-# -------------------------
+# =========================================================
 
-def get_text(response):
-
+def get_text(response) -> str:
     content = response.content
 
     if isinstance(content, list):
@@ -35,113 +39,175 @@ def get_text(response):
     return content
 
 
-# -------------------------
-# Router
-# -------------------------
-
-def router(state: CodeState):
-
-    if state["task"] == "explain":
-        return "explain"
-
-    elif state["task"] == "debug":
-        return "debug"
-
-    else:
-        return "optimize"
-
-
-# -------------------------
-# Explain Node
-# -------------------------
+# =========================================================
+# Task Nodes — unchanged from before. No tool calling, no agent decisions.
+# =========================================================
 
 def explain_node(state: CodeState):
-
     prompt = f"""
-    You are an expert programming assistant.
+You are an expert programming assistant.
 
-    Explain the following {state["language"]} code
-    clearly and step by step.
+Explain this {state['language']} code clearly and step by step.
 
-    Code:
-    {state["code"]}
-    """
-
+Code:
+{state['code']}
+"""
     response = model.invoke(prompt)
+    return {"result": get_text(response)}
 
-    return {
-        "result": get_text(response)
-    }
-
-
-# -------------------------
-# Debug Node
-# -------------------------
 
 def debug_node(state: CodeState):
-
     prompt = f"""
-    You are an expert programming assistant.
+You are an expert programming debugger.
 
-    Find bugs or errors in the following {state["language"]} code.
+Analyze this {state['language']} code.
 
-    Explain:
-    1. What is wrong
-    2. Why it is wrong
-    3. How to fix it
+Find:
+1. What is wrong
+2. Why it is wrong
+3. How to fix it
+4. Corrected code when appropriate
 
-    Code:
-    {state["code"]}
-    """
+Do not invent bugs if the code is correct.
 
+Code:
+{state['code']}
+"""
     response = model.invoke(prompt)
+    return {"result": get_text(response)}
 
-    return {
-        "result": get_text(response)
-    }
-
-
-# -------------------------
-# Optimize Node
-# -------------------------
 
 def optimize_node(state: CodeState):
-
     prompt = f"""
-    You are an expert programming assistant.
+You are an expert software engineer.
 
-    Suggest improvements for this {state["language"]} code.
+Improve this {state['language']} code.
 
-    Focus on:
-    - readability
-    - efficiency
-    - performance
-    - good coding practices
+Focus on:
+- Time complexity
+- Space complexity
+- Performance
+- Readability
+- Maintainability
 
-    Code:
-    {state["code"]}
+Provide improved code when useful.
+
+Code:
+{state['code']}
+"""
+    response = model.invoke(prompt)
+    return {"result": get_text(response)}
+
+
+def test_node(state: CodeState):
+    prompt = f"""
+You are an expert testing engineer.
+
+Generate useful test cases for this {state['language']} code.
+
+Include:
+1. Normal cases
+2. Edge cases
+3. Boundary cases
+4. Expected outputs
+
+Code:
+{state['code']}
+"""
+    response = model.invoke(prompt)
+    return {"result": get_text(response)}
+
+
+def complexity_node(state: CodeState):
+    prompt = f"""
+You are an expert algorithms engineer.
+
+Analyze this {state['language']} code.
+
+Determine:
+1. Time complexity
+2. Space complexity
+3. Why those complexities occur
+4. Best/worst case when relevant
+
+Code:
+{state['code']}
+"""
+    response = model.invoke(prompt)
+    return {"result": get_text(response)}
+
+
+def analyze_node(state: CodeState):
+    """
+    Code Chat / Analyze — the only node that reads/writes `messages`.
+    With the checkpointer attached, `state["messages"]` here already
+    contains the full prior history for this thread_id, loaded
+    automatically by LangGraph before this node ran. We just append
+    the new question + answer; add_messages merges them in.
     """
 
-    response = model.invoke(prompt)
+    question = state.get("question") or "Explain this code."
+
+    if not state.get("messages"):
+        # First turn for this thread_id: seed with framing + question.
+        framing = f"""
+You are an expert programming assistant.
+
+Programming language:
+{state['language']}
+
+Code:
+{state['code']}
+
+Answer the user's questions specifically using the supplied code.
+Do not invent information that is not present in the code.
+"""
+        seed = HumanMessage(content=framing)
+        question_msg = HumanMessage(content=question)
+        history = [seed, question_msg]
+    else:
+        # Follow-up turn: prior messages were auto-loaded by the checkpointer.
+        question_msg = HumanMessage(content=question)
+        history = state["messages"] + [question_msg]
+
+    response = model.invoke(history)
+    ai_msg = AIMessage(content=get_text(response))
 
     return {
-        "result": get_text(response)
+        "result": get_text(response),
+        "messages": [question_msg, ai_msg] if state.get("messages") else history + [ai_msg],
     }
 
 
-# -------------------------
+# =========================================================
+# Router
+# =========================================================
+
+def router(state: CodeState) -> str:
+    task = (state.get("task") or "").strip().lower()
+
+    valid_tasks = {"explain", "debug", "optimize", "test", "complexity", "analyze"}
+
+    if task not in valid_tasks:
+        raise ValueError(
+            f"Unknown task '{task}'. Must be one of: {sorted(valid_tasks)}"
+        )
+
+    return task
+
+
+# =========================================================
 # Build Graph
-# -------------------------
+# =========================================================
 
 graph = StateGraph(CodeState)
-
 
 graph.add_node("explain", explain_node)
 graph.add_node("debug", debug_node)
 graph.add_node("optimize", optimize_node)
-
-
-# START → Router → Selected Node
+graph.add_node("test", test_node)
+graph.add_node("complexity", complexity_node)
+graph.add_node("analyze", analyze_node)
 
 graph.add_conditional_edges(
     START,
@@ -149,36 +215,17 @@ graph.add_conditional_edges(
     {
         "explain": "explain",
         "debug": "debug",
-        "optimize": "optimize"
-    }
+        "optimize": "optimize",
+        "test": "test",
+        "complexity": "complexity",
+        "analyze": "analyze",
+    },
 )
 
-
-# Selected Node → END
-
-graph.add_edge("explain", END)
-graph.add_edge("debug", END)
-graph.add_edge("optimize", END)
+for node_name in ["explain", "debug", "optimize", "test", "complexity", "analyze"]:
+    graph.add_edge(node_name, END)
 
 
-# Compile graph
-
-app = graph.compile()
-
-
-# -------------------------
-# Test
-# -------------------------
-
-if __name__ == "__main__":
-
-    result = app.invoke({
-        "code": "def add(a, b): return a + b",
-        "language": "python",
-        "task": "debug",
-        "result": ""
-    })
-
-    print("\nAI RESPONSE:\n")
-    print(result["result"])
+checkpointer = MemorySaver()
+app = graph.compile(checkpointer=checkpointer)
 
