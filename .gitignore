@@ -8,3 +8,19 @@ __pycache__/
 venv/
 dist/
 build/
+
+# Database / checkpoints
+checkpoints.sqlite
+*.sqlite
+*.db
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,78 +1,41 @@
+// ─────────────────────────────────────────────────────────────
+// App.jsx — Root component
+//
+// Wraps everything in AppProvider (the context).
+// AppContent reads the context to decide which panel to show.
+// No props are passed anywhere — every child uses useApp().
+// ─────────────────────────────────────────────────────────────
 
-import { useState } from "react";
+import { AppProvider, useApp } from './context/AppContext'
+import Sidebar      from './components/Sidebar'
+import AnalyzePanel from './components/AnalyzePanel'
+import ChatPanel    from './components/ChatPanel'
+import ErrorBoundary from './components/ErrorBoundary'
 
-function App() {
-  const [code, setCode] = useState("");
-  const [task, setTask] = useState("explain");
-  const [response, setResponse] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  async function analyzeCode() {
-    setLoading(true);
-    setResponse("");
-
-    try {
-      const res = await fetch("http://127.0.0.1:8000/analyze", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          code: code,
-          language: "python",
-          task: task,
-        }),
-      });
-
-      const data = await res.json();
-
-      setResponse(data.response);
-    } catch (error) {
-      console.error(error);
-      setResponse("Something went wrong.");
-    } finally {
-      setLoading(false);
-    }
-  }
+// Inner component that reads context — must be inside AppProvider
+function AppContent() {
+  const { activeTab } = useApp()
 
   return (
-    <div>
-      <h1>Code Assistant</h1>
-
-      <textarea
-        value={code}
-        onChange={(e) => setCode(e.target.value)}
-        placeholder="Paste your code here..."
-        rows="10"
-        cols="60"
-      />
-
-      <br />
-      <br />
-
-      <select
-        value={task}
-        onChange={(e) => setTask(e.target.value)}
-      >
-        <option value="explain">Explain Code</option>
-        <option value="debug">Debug Code</option>
-        <option value="optimize">Optimize Code</option>
-      </select>
-
-      <br />
-      <br />
-
-      <button onClick={analyzeCode} disabled={loading}>
-        {loading ? "Analyzing..." : "Analyze Code"}
-      </button>
-
-      <h2>AI Response</h2>
-
-      <pre>
-        {response}
-      </pre>
+    <div className="flex h-screen bg-[#111111] text-[#e5e5e5] overflow-hidden">
+      <Sidebar />
+      <main className="flex-1 overflow-hidden">
+        <ErrorBoundary>
+          {activeTab === 'analyze' && <AnalyzePanel />}
+          {activeTab === 'chat'    && <ChatPanel />}
+        </ErrorBoundary>
+      </main>
     </div>
-  );
+  )
 }
 
-export default App;
+// Outer component provides the context to everything inside
+function App() {
+  return (
+    <AppProvider>
+      <AppContent />
+    </AppProvider>
+  )
+}
+
+export default App
