@@ -11,6 +11,7 @@ import { useRef, useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { processMarkdown } from '../config'
 
 function ResponsePanel({ result, loading, error, task }) {
   const [copied, setCopied] = useState(false)
@@ -137,7 +138,7 @@ function ResponsePanel({ result, loading, error, task }) {
               ),
             }}
           >
-            {result}
+            {processMarkdown(result)}
           </ReactMarkdown>
         </div>
 
