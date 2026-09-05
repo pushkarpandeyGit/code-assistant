@@ -35,14 +35,24 @@ function AnalyzePanel() {
   const taskLabel = TASK_META[activeTask] || 'Analyze'
 
   const runAnalysis = async () => {
-    if (!code.trim()) { setError('Add some code first.'); return }
-    setLoading(true); setResult(''); setError('')
+    if (!code.trim()) {
+      setError('Add some code first.')
+      return
+    }
+
+    setLoading(true)
+    setResult('')
+    setError('')
 
     try {
-      const response = await fetch(`${API_BASE}/stream`, {
+      const response = await fetch(`${API_BASE}/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, language, task: activeTask }),
+        body: JSON.stringify({
+          code,
+          language,
+          task: activeTask,
+        }),
       })
 
       if (!response.ok) {
@@ -50,33 +60,15 @@ function AnalyzePanel() {
         throw new Error(e.detail?.message || `Error ${response.status}`)
       }
 
-      const reader  = response.body.getReader()
-      const decoder = new TextDecoder()
-      let buffer = ''
-      let done   = false
+      const data = await response.json()
+      setResult(data.result)
 
-      while (!done) {
-        const { value, done: sd } = await reader.read()
-        if (sd) break
-        buffer += decoder.decode(value, { stream: true })
-        const lines = buffer.split('\n')
-        buffer = lines.pop() || ''
-        for (const line of lines) {
-          if (!line.startsWith('data: ')) continue
-          const str = line.slice(6).trim()
-          if (!str) continue
-          try {
-            const { t } = JSON.parse(str)
-            if (t === '[DONE]')         { done = true; break }
-            if (t?.startsWith('[ERROR]')) throw new Error(t.replace('[ERROR] ', ''))
-            setResult(prev => prev + t)
-          } catch (pe) { if (pe.message) throw pe }
-        }
-      }
     } catch (err) {
-      setError(err.message === 'Failed to fetch'
-        ? 'Cannot reach backend. Is uvicorn running on port 8000?'
-        : err.message || 'Unexpected error')
+      setError(
+        err.message === 'Failed to fetch'
+          ? 'Cannot reach backend. Please check the backend connection.'
+          : err.message || 'Unexpected error'
+      )
     } finally {
       setLoading(false)
     }
