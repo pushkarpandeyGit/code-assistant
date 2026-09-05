@@ -3,7 +3,7 @@
 //
 // Added: sidebarOpen / setSidebarOpen for mobile hamburger menu
 // ─────────────────────────────────────────────────────────────
-
+import { API_BASE } from '../config'
 import { createContext, useContext, useState, useEffect } from 'react'
 
 const AppContext = createContext(null)
@@ -16,7 +16,7 @@ export function AppProvider({ children }) {
   const [sidebarOpen,  setSidebarOpen]  = useState(false)
 
   useEffect(() => {
-    fetch('http://localhost:8000/health')
+    fetch(`${API_BASE}/health`)
       .then(r => r.ok ? setServerStatus('online') : setServerStatus('offline'))
       .catch(() => setServerStatus('offline'))
   }, [])
