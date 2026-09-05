@@ -6,7 +6,7 @@
 // In production:  set VITE_API_URL=https://your-backend.railway.app in Vercel
 // ─────────────────────────────────────────────────────────────
 
-export const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+export const API_BASE = import.meta.env.VITE_API_URL || 'https://code-assistant-production-e0b1.up.railway.app'
 
 // ── Math preprocessor ──────────────────────────────────────────
 // The AI outputs LaTeX math like $O(n^2)$ and $$\frac{n}{2}$$
