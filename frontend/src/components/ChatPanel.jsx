@@ -72,24 +72,68 @@ function ChatPanel() {
       setLoading(false) }
   }
 
+  // ── Resizable Split-Pane State ─────────────────────────────
+  const [splitRatio, setSplitRatio] = useState(40)
+  const [isDragging, setIsDragging] = useState(false)
+  const containerRef = useRef(null)
+
+  const handleMouseDown = (e) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isDragging || !containerRef.current) return
+      const rect = containerRef.current.getBoundingClientRect()
+      const relativeX = e.clientX - rect.left
+      const percentage = (relativeX / rect.width) * 100
+      if (percentage >= 20 && percentage <= 75) {
+        setSplitRatio(percentage)
+      }
+    }
+
+    const handleMouseUp = () => setIsDragging(false)
+
+    if (isDragging) {
+      window.addEventListener('mousemove', handleMouseMove)
+      window.addEventListener('mouseup', handleMouseUp)
+    }
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [isDragging])
+
   const startNewChat = () => { threadIdRef.current = null; setMessages([]); setError('') }
 
   const shortId = threadIdRef.current?.slice(0, 8)
 
   return (
-    <div className="h-full flex overflow-hidden">
+    <div 
+      ref={containerRef}
+      className={`h-full flex overflow-hidden ${isDragging ? 'select-none cursor-col-resize' : ''}`}
+    >
 
       {/* ── Editor panel ──────────────────────────────────
-          Desktop: always visible (w-[40%])
+          Desktop: resizable via splitRatio
           Mobile:  hidden by default, toggle with button */}
-      <div className={`
-        flex-col border-r border-[#222]
-        md:flex md:w-[40%]
-        ${showEditor ? 'flex w-full absolute inset-0 z-10 bg-[#111111]' : 'hidden'}
-      `}>
+      <div 
+        style={{ width: undefined }}
+        className={`
+          flex-col border-r border-[#222]
+          md:flex
+          ${showEditor ? 'flex w-full absolute inset-0 z-20 bg-[#111111]' : 'hidden'}
+        `}
+        ref={(el) => {
+          if (el && window.innerWidth >= 768) {
+            el.style.width = `${splitRatio}%`
+          }
+        }}
+      >
         {/* Mobile editor header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#222] flex-shrink-0">
-          <p className="text-sm font-semibold text-[#ccc]">Code Context</p>
+        <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#222] flex-shrink-0 bg-[#141414]">
+          <p className="text-xs font-semibold text-[#ccc]">Code Context</p>
           <button onClick={() => setShowEditor(false)} className="md:hidden text-[#555] hover:text-[#bbb] text-xs">
             Done
           </button>
@@ -104,22 +148,78 @@ function ChatPanel() {
         </div>
       </div>
 
+      {/* ── Draggable Divider Bar (Desktop Only) ──────────────── */}
+      <div
+        onMouseDown={handleMouseDown}
+        className={`
+          hidden md:flex items-center justify-center w-2.5 bg-[#141414] hover:bg-blue-600/20
+          cursor-col-resize transition-colors border-x border-[#222] z-10 select-none
+          ${isDragging ? 'bg-blue-600/30 border-blue-500/50' : ''}
+        `}
+        title="Drag left or right to resize panels"
+      >
+        <div className="flex flex-col gap-1 items-center">
+          <span className="w-0.5 h-0.5 rounded-full bg-[#555]" />
+          <span className="w-0.5 h-0.5 rounded-full bg-[#555]" />
+          <span className="w-0.5 h-0.5 rounded-full bg-[#555]" />
+        </div>
+      </div>
+
       {/* ── Chat panel ───────────────────────────────────── */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div 
+        style={{ width: undefined }}
+        className="flex-1 flex flex-col min-w-0"
+        ref={(el) => {
+          if (el && window.innerWidth >= 768) {
+            el.style.width = `${100 - splitRatio}%`
+          }
+        }}
+      >
 
         {/* Chat header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#222] flex-shrink-0 gap-2">
+        <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#222] flex-shrink-0 gap-2 bg-[#141414]">
           <div className="flex items-center gap-2">
-            {/* Hamburger (mobile) */}
-            <button onClick={() => setSidebarOpen(true)} className="md:hidden flex flex-col gap-1 p-1" aria-label="Menu">
-              <span className="w-4 h-px bg-[#666]" /><span className="w-4 h-px bg-[#666]" /><span className="w-4 h-px bg-[#666]" />
-            </button>
             <div>
-              <p className="text-sm font-semibold text-[#ccc]">Code Chat</p>
+              <p className="text-xs font-semibold text-[#ccc]">Conversation</p>
               {shortId
-                ? <p className="text-[11px] text-[#444] font-mono">thread <span className="text-blue-400">{shortId}...</span></p>
-                : <p className="text-[11px] text-[#333]">No active thread</p>}
+                ? <p className="text-[10px] text-[#555] font-mono">session <span className="text-blue-400">{shortId}</span></p>
+                : <p className="text-[10px] text-[#444]">Ready</p>}
             </div>
+          </div>
+
+          {/* Quick Layout Presets (Desktop) */}
+          <div className="hidden lg:flex items-center gap-1.5 text-[10px] text-[#555] font-mono">
+            <span>Layout:</span>
+            <button
+              onClick={() => setSplitRatio(60)}
+              className={`px-1.5 py-0.5 rounded border transition-colors ${
+                splitRatio > 50
+                  ? 'border-blue-500/50 bg-blue-500/15 text-blue-400'
+                  : 'border-[#262626] bg-[#1a1a1a] text-[#777] hover:text-[#bbb]'
+              }`}
+            >
+              Code 60%
+            </button>
+            <button
+              onClick={() => setSplitRatio(40)}
+              className={`px-1.5 py-0.5 rounded border transition-colors ${
+                splitRatio <= 50 && splitRatio >= 35
+                  ? 'border-blue-500/50 bg-blue-500/15 text-blue-400'
+                  : 'border-[#262626] bg-[#1a1a1a] text-[#777] hover:text-[#bbb]'
+              }`}
+            >
+              Balanced
+            </button>
+            <button
+              onClick={() => setSplitRatio(25)}
+              className={`px-1.5 py-0.5 rounded border transition-colors ${
+                splitRatio < 35
+                  ? 'border-blue-500/50 bg-blue-500/15 text-blue-400'
+                  : 'border-[#262626] bg-[#1a1a1a] text-[#777] hover:text-[#bbb]'
+              }`}
+            >
+              Chat 75%
+            </button>
           </div>
           <div className="flex items-center gap-2">
             {/* Mobile: toggle editor */}

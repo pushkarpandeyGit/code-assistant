@@ -6,6 +6,23 @@ html, body, #root {
   overflow: hidden;
   margin: 0;
   padding: 0;
+  background-color: #111111;
+}
+
+/* ── Custom sleek dark scrollbar ───────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #282828;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3b82f6;
 }
 
 /* ── Custom markdown styles ─────────────────────────────────────────────
