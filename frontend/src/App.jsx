@@ -1,9 +1,8 @@
 // ─────────────────────────────────────────────────────────────
-// App.jsx — Root layout (responsive)
+// App.jsx — Fluid Website Layout
 //
-// Desktop:  Sidebar always visible (md:flex)
-// Mobile:   Sidebar hidden, slides in as overlay when sidebarOpen
-//           Dark overlay closes sidebar on tap
+// Desktop: Sticky sidebar + sticky header + flowing scrollable website
+// Mobile:  Slide-over sidebar + fluid continuous scrolling
 // ─────────────────────────────────────────────────────────────
 
 import { AppProvider, useApp } from './context/AppContext'
@@ -18,44 +17,45 @@ function AppContent() {
   const { activeTab, sidebarOpen, setSidebarOpen } = useApp()
 
   return (
-    <div className="flex h-screen bg-[#111111] text-[#e5e5e5] overflow-hidden">
+    <div className="flex min-h-screen bg-[#111111] text-[#e5e5e5] relative">
 
-      {/* ── Mobile dark overlay ──────────────────────────────
-          Shown behind the sidebar on mobile so tapping outside closes it. */}
+      {/* ── Mobile Backdrop ─────────────────────────────────── */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/70 z-40 md:hidden backdrop-blur-xs transition-opacity"
+          className="fixed inset-0 bg-black/75 z-40 md:hidden backdrop-blur-xs transition-opacity"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* ── Sidebar ─────────────────────────────────────────
-          Desktop: always visible (translate-x-0)
-          Mobile:  slides in from left when sidebarOpen=true */}
+      {/* ── Left Sidebar (Sticky on desktop, drawer on mobile) ── */}
       <div className={`
-        fixed md:relative z-50 h-full
+        fixed md:sticky top-0 z-50 h-screen
         transition-transform duration-200 ease-in-out
         ${sidebarOpen ? 'translate-x-0 shadow-2xl shadow-black' : '-translate-x-full md:translate-x-0'}
       `}>
         <Sidebar />
       </div>
 
-      {/* ── Main content layout with Header, Panel, Footer ── */}
-      <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
-        {/* Top Header with Logo, Tagline, Mode & Server Status */}
-        <Header />
+      {/* ── Main Scrollable Content Area ────────────────────── */}
+      <div className="flex-1 flex flex-col min-h-screen min-w-0 bg-[#111111]">
+        
+        {/* Sticky Header at top of workspace */}
+        <div className="sticky top-0 z-30">
+          <Header />
+        </div>
 
         {/* Core Working Area */}
-        <main className="flex-1 overflow-hidden min-w-0 flex flex-col relative">
+        <main className="flex-1 min-w-0 flex flex-col">
           <ErrorBoundary>
             {activeTab === 'analyze' && <AnalyzePanel />}
             {activeTab === 'chat'    && <ChatPanel />}
           </ErrorBoundary>
         </main>
 
-        {/* Bottom Professional Footer */}
+        {/* Application Footer */}
         <Footer />
       </div>
+
     </div>
   )
 }
