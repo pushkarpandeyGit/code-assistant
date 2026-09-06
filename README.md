@@ -9,7 +9,7 @@
 
 ##  Live Demo
 
-- **Try coedass:** [codeassistant-7y40vv1f5-pushkar24.vercel.app](https://coedass.vercel.app/)
+- **Try coedass:** [coedass](https://coedass.vercel.app/)
 
 ---
 
