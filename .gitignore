@@ -24,3 +24,5 @@ checkpoints.sqlite
 # OS
 .DS_Store
 Thumbs.db
+
+INTERVIEW_GUIDE.html
