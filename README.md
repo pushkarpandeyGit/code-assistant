@@ -1,4 +1,4 @@
-# coedass — AI Code Assistant
+# <c> coedass — AI Code Assistant
 
 > A full-stack AI coding workspace for explaining, debugging, optimizing, testing, and analyzing code.
 
