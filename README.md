@@ -1,4 +1,4 @@
-# CodeAssist — AI Code Assistant
+# coedass — AI Code Assistant
 
 > A full-stack AI coding workspace for explaining, debugging, optimizing, testing, and analyzing code.
 
@@ -10,7 +10,7 @@
 
 ## 🚀 Live Demo
 
-- **Try CodeAssist:** [codeassistant-7y40vv1f5-pushkar24.vercel.app](https://codeassistant-7y40vv1f5-pushkar24.vercel.app)
+- **Try CodeAssist:** [codeassistant-7y40vv1f5-pushkar24.vercel.app](https://coedass.vercel.app/)
 - **Source Code:** [github.com/pushkarpandeyGit/code-assistant](https://github.com/pushkarpandeyGit/code-assistant)
 
 ---
@@ -19,31 +19,35 @@
 
 ### 1. Main Workspace
 <!-- SCREENSHOT 1: Take a screenshot showing the complete CodeAssist interface: sidebar + code editor + selected task + response area. Use this as the main hero screenshot. -->
-![CodeAssist Main Workspace](screenshots/main-workspace.png)
+![CodeAssist Main Workspace]<img width="1903" height="907" alt="image" src="https://github.com/user-attachments/assets/d26ea7ed-4f7d-4f61-b10a-7460294a107e" />
+
 
 ---
 
 ### 2. AI Code Explanation
 <!-- SCREENSHOT 2: Enter a piece of code, select "Explain Code", run it, and capture the editor + generated explanation. -->
-![AI Code Explanation](screenshots/explain.png)
+![AI Code Explanation]<img width="1898" height="908" alt="image" src="https://github.com/user-attachments/assets/08efc0d1-4035-43bc-ba49-976f3fa041d3" />
+
 
 ---
 
 ### 3. Debugging
 <!-- SCREENSHOT 3: Enter code containing a bug, select Debug, run it, and capture the generated debugging response with the fix. -->
-![Code Debugging](screenshots/debug.png)
+![Code Debugging]<img width="1897" height="908" alt="image" src="https://github.com/user-attachments/assets/888d0ca7-ccce-455a-b8fa-8764142de786" />
+
 
 ---
 
 ### 4. Code Chat
 <!-- SCREENSHOT 4: Open Code Chat. Ask one question about the code, then a follow-up question showing that conversation context is maintained. -->
-![Code Chat](screenshots/chat.png)
+![Code Chat]<img width="1901" height="907" alt="image" src="https://github.com/user-attachments/assets/8a8d489f-fe46-4b5b-ba26-01f1deaedc50" />
+
 
 ---
 
-## 💡 What is CodeAssist?
+## 💡 What is coedass?
 
-CodeAssist is a full-stack AI-powered coding assistant that allows developers to work with code directly inside a browser-based development workspace. Instead of copying code into a general-purpose chatbot, users can enter code into a Monaco-based editor and choose a specific engineering task.
+coedass is a full-stack AI-powered coding assistant that allows developers to work with code directly inside a browser-based development workspace. Instead of copying code into a general-purpose chatbot, users can enter code into a Monaco-based editor and choose a specific engineering task.
 
 ### Current Capabilities
 - 🔍 **Explain Code** — Understand code step by step with clear overviews and line-by-line breakdowns
