@@ -2,50 +2,48 @@
 
 > A full-stack AI coding workspace for explaining, debugging, optimizing, testing, and analyzing code.
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-success)](https://codeassistant-7y40vv1f5-pushkar24.vercel.app)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-success)](https://coedass.vercel.app/)
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-black)](https://github.com/pushkarpandeyGit/code-assistant)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ---
 
 ## 🚀 Live Demo
 
-- **Try CodeAssist:** [codeassistant-7y40vv1f5-pushkar24.vercel.app](https://coedass.vercel.app/)
-- **Source Code:** [github.com/pushkarpandeyGit/code-assistant](https://github.com/pushkarpandeyGit/code-assistant)
+- **Try coedass:** [codeassistant-7y40vv1f5-pushkar24.vercel.app](https://coedass.vercel.app/)
 
 ---
 
 ## 📸 Screenshots
 
 ### 1. Main Workspace
-<!-- SCREENSHOT 1: Take a screenshot showing the complete CodeAssist interface: sidebar + code editor + selected task + response area. Use this as the main hero screenshot. -->
-![CodeAssist Main Workspace]<img width="1903" height="907" alt="image" src="https://github.com/user-attachments/assets/d26ea7ed-4f7d-4f61-b10a-7460294a107e" />
+
+<img width="1903" height="907" alt="image" src="https://github.com/user-attachments/assets/d26ea7ed-4f7d-4f61-b10a-7460294a107e" />
 
 
 ---
 
 ### 2. AI Code Explanation
-<!-- SCREENSHOT 2: Enter a piece of code, select "Explain Code", run it, and capture the editor + generated explanation. -->
-![AI Code Explanation]<img width="1898" height="908" alt="image" src="https://github.com/user-attachments/assets/08efc0d1-4035-43bc-ba49-976f3fa041d3" />
+
+<img width="1898" height="908" alt="image" src="https://github.com/user-attachments/assets/08efc0d1-4035-43bc-ba49-976f3fa041d3" />
 
 
 ---
 
 ### 3. Debugging
-<!-- SCREENSHOT 3: Enter code containing a bug, select Debug, run it, and capture the generated debugging response with the fix. -->
-![Code Debugging]<img width="1897" height="908" alt="image" src="https://github.com/user-attachments/assets/888d0ca7-ccce-455a-b8fa-8764142de786" />
+
+<img width="1897" height="908" alt="image" src="https://github.com/user-attachments/assets/888d0ca7-ccce-455a-b8fa-8764142de786" />
 
 
 ---
 
 ### 4. Code Chat
-<!-- SCREENSHOT 4: Open Code Chat. Ask one question about the code, then a follow-up question showing that conversation context is maintained. -->
-![Code Chat]<img width="1901" height="907" alt="image" src="https://github.com/user-attachments/assets/8a8d489f-fe46-4b5b-ba26-01f1deaedc50" />
+
+<img width="1901" height="907" alt="image" src="https://github.com/user-attachments/assets/8a8d489f-fe46-4b5b-ba26-01f1deaedc50" />
 
 
 ---
 
-## 💡 What is coedass?
+##  What is coedass?
 
 coedass is a full-stack AI-powered coding assistant that allows developers to work with code directly inside a browser-based development workspace. Instead of copying code into a general-purpose chatbot, users can enter code into a Monaco-based editor and choose a specific engineering task.
 
@@ -59,52 +57,11 @@ coedass is a full-stack AI-powered coding assistant that allows developers to wo
 
 ---
 
-## 🏗️ Architecture
+##  Architecture
+<img width="412" height="816" alt="image" src="https://github.com/user-attachments/assets/6c0f2719-7b95-455b-809f-4831311254c7" />
 
-```text
-┌──────────────────┐
-│       User       │
-└────────┬─────────┘
-         │
-         ▼
-┌──────────────────┐
-│  React Frontend  │
-│  + Tailwind CSS  │
-│  + Monaco Editor │
-└────────┬─────────┘
-         │  HTTP / SSE
-         ▼
-┌──────────────────┐
-│ FastAPI Backend  │
-└────────┬─────────┘
-         │
-         ▼
-┌──────────────────┐
-│    LangGraph     │
-│      Router      │
-└────────┬─────────┘
-         │
- ┌───────┼───────┐
- ▼       ▼       ▼
-Explain Debug Optimize ...
- │       │       │
- └───────┼───────┘
-         │
-         ▼
-┌──────────────────┐
-│  Google Gemini   │
-└────────┬─────────┘
-         │
-         ▼
-┌──────────────────┐
-│  Response / SSE  │
-└────────┬─────────┘
-         │
-         ▼
-┌──────────────────┐
-│     React UI     │
-└──────────────────┘
-```
+
+
 
 ### Production Deployment Pipeline
 
@@ -130,7 +87,7 @@ Browser ──> Vercel (React Frontend Edge)
 
 ---
 
-## 🧩 How It Works
+##  How It Works
 
 1. **User enters code:** Code is typed or pasted directly into the Monaco Editor.
 2. **User selects a task:** The selected task determines what type of analysis should be performed.
@@ -151,7 +108,7 @@ Browser ──> Vercel (React Frontend Edge)
 
 ---
 
-## 🧠 Technology Stack
+##  Technology Stack
 
 | Technology | Purpose |
 |---|---|
@@ -169,31 +126,16 @@ Browser ──> Vercel (React Frontend Edge)
 
 ---
 
-## 🔄 AI Workflow
+##  AI Workflow
 
-CodeAssist uses a task-based LangGraph workflow:
+coedass uses a task-based LangGraph workflow:
+<img width="1085" height="747" alt="image" src="https://github.com/user-attachments/assets/130906ac-517b-42c8-a833-fea06ba814c2" />
 
-```text
-  [ START ]
-      │
-      ▼
-   [ Router ]
- ┌────┼────┐
- ▼    ▼    ▼
-Explain Debug Optimize  (and Test, Complexity, Analyze)
- │    │    │
- └────┼────┘
-      │
-      ▼
-  [ Response ]
-      │
-      ▼
-   [ END ]
-```
+
 
 ---
 
-## 💬 Stateful Code Chat
+##  Stateful Code Chat
 
 The **Code Chat** feature supports multi-turn follow-up questions about the active code. Each conversation is associated with a unique `thread_id`:
 
@@ -220,9 +162,9 @@ The current implementation uses `MemorySaver` for in-memory checkpointing, prese
 
 ---
 
-## ⚡ Streaming
+## Streaming
 
-CodeAssist supports streamed responses for one-shot analysis using Server-Sent Events (SSE):
+coedass supports streamed responses for one-shot analysis using Server-Sent Events (SSE):
 
 ```text
 Gemini ──> Backend ──> SSE Events ──> Browser ReadableStream ──> TextDecoder ──> JSON Parsing ──> React State ──> ResponsePanel
@@ -236,7 +178,7 @@ and progressively updates the displayed result as tokens arrive.
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```text
 code-assistant/
@@ -259,15 +201,13 @@ code-assistant/
 │   ├── package.json         # Frontend dependencies and build scripts
 │   ├── vite.config.js       # Vite configuration with Tailwind CSS plugin
 │   └── .env.example         # Environment template for frontend
-├── screenshots/             # Application screenshots for showcase
-├── INTERVIEW_GUIDE.md       # In-depth technical interview manual
 ├── .gitignore
 └── README.md
 ```
 
 ---
 
-## 🛠️ Running Locally
+##  Running Locally
 
 ### 1. Prerequisites
 - **Node.js** (v18+) and **npm**
@@ -291,7 +231,6 @@ pip install -r requirements.txt
 
 # Create .env file
 copy .env.example .env     # Windows
-# cp .env.example .env     # macOS / Linux
 ```
 
 Add your Gemini API key in `backend/.env`:
@@ -325,7 +264,7 @@ VITE_API_URL=http://localhost:8000
 
 ---
 
-## 🔐 Environment Variables
+##  Environment Variables
 
 ### Backend (`backend/.env`)
 ```env
@@ -341,7 +280,7 @@ VITE_API_URL=http://localhost:8000
 
 ---
 
-## 🌐 Deployment
+##  Deployment
 
 - **Frontend:** Deployed to **Vercel** connected directly to the GitHub repository.
 - **Backend:** Deployed to **Railway** running FastAPI inside a managed container.
@@ -349,7 +288,7 @@ VITE_API_URL=http://localhost:8000
 
 ---
 
-## 🐛 A Real Deployment Issue I Solved
+##  A Real Deployment Issue I Solved
 
 During production deployment, the application worked smoothly locally but failed in production with browser fetch errors:
 ```text
@@ -384,7 +323,7 @@ This resolved the issue across both production domains and ephemeral Vercel prev
 
 ---
 
-## 🔮 Possible Future Improvements
+##  Possible Future Improvements
 
 - [ ] Persistent database-backed conversation history (PostgreSQL / Redis)
 - [ ] User authentication and saved code sessions
@@ -394,7 +333,7 @@ This resolved the issue across both production domains and ephemeral Vercel prev
 
 ---
 
-## 🎯 Key Engineering Concepts Demonstrated
+##  Key Engineering Concepts Demonstrated
 
 - **Component-Based Frontend:** Clean React component hierarchy and separation of concerns
 - **State Management:** React Context API for global state without prop-drilling
@@ -407,18 +346,16 @@ This resolved the issue across both production domains and ephemeral Vercel prev
 
 ---
 
-## 👨‍💻 Author
+##  Author
 
-**Pushkar**  
+**Pushkar Kumar Pandey**  
 B.Tech — Electronics & Communication Engineering  
 VIT Chennai  
 
-- **GitHub:** [@pushkarpandeyGit](https://github.com/pushkarpandeyGit)
-- **Repository:** [code-assistant](https://github.com/pushkarpandeyGit/code-assistant)
 
 ---
 
-## ⭐ Project Links
+## Project Links
 
-- **Live Demo:** [codeassistant-7y40vv1f5-pushkar24.vercel.app](https://codeassistant-7y40vv1f5-pushkar24.vercel.app)
+- **Live Demo:** [coedass](https://coedass.vercel.app/)
 - **GitHub Repository:** [github.com/pushkarpandeyGit/code-assistant](https://github.com/pushkarpandeyGit/code-assistant)
