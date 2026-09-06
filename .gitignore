@@ -24,5 +24,9 @@ checkpoints.sqlite
 # OS
 .DS_Store
 Thumbs.db
-
+# Interview Prep Materials & Scripts (Private)
 INTERVIEW_GUIDE.html
+INTERVIEW_GUIDE.md
+*.pdf
+build_interview_pdf.py
+test_pdf_setup.py
