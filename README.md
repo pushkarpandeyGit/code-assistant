@@ -1,4 +1,4 @@
-# <c> coedass — AI Code Assistant
+#  <c> coedass — AI Code Assistant
 
 > A full-stack AI coding workspace for explaining, debugging, optimizing, testing, and analyzing code.
 
@@ -7,13 +7,13 @@
 
 ---
 
-## 🚀 Live Demo
+##  Live Demo
 
 - **Try coedass:** [codeassistant-7y40vv1f5-pushkar24.vercel.app](https://coedass.vercel.app/)
 
 ---
 
-## 📸 Screenshots
+##  Screenshots
 
 ### 1. Main Workspace
 
